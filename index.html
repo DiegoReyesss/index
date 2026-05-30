@@ -568,6 +568,67 @@ input[type=file]{display:none;}
   margin:6px 0 20px;
 }
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+
+/* BOTON $4 */
+.precio-row { display:flex; gap:10px; align-items:flex-end; }
+.precio-row .ig { flex:1; margin-bottom:0; }
+.btn-precio-rapido {
+  height:52px; min-width:72px; padding:0 16px;
+  border-radius:var(--r-input);
+  background:linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,200,100,0.08));
+  border:1px solid rgba(0,255,136,0.3);
+  color:var(--success); font-size:15px; font-weight:800;
+  cursor:pointer; transition:all var(--trans-fast);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:1px; font-family:'DM Sans',sans-serif; flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,255,136,0.12);
+}
+.btn-precio-rapido:active { transform:scale(0.93); background:rgba(0,255,136,0.2); }
+.btn-precio-rapido .bpr-sub { font-size:9px; color:var(--text-muted); font-weight:600; letter-spacing:0.3px; }
+
+/* MULTI FOTOS */
+.fotos-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;
+}
+.foto-thumb-wrap {
+  position:relative; border-radius:14px; overflow:hidden;
+  aspect-ratio:1/1; background:rgba(255,255,255,0.03);
+  border:1px solid var(--border-glass);
+}
+.foto-thumb-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.foto-thumb-del {
+  position:absolute; top:5px; right:5px;
+  width:24px; height:24px; border-radius:50%;
+  background:rgba(0,0,0,0.7); border:none;
+  color:#fff; font-size:11px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.add-foto-btn {
+  border-radius:14px; aspect-ratio:1/1;
+  background:rgba(123,44,255,0.06);
+  border:2px dashed rgba(123,44,255,0.3);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:5px; cursor:pointer; transition:all var(--trans-fast);
+  color:var(--primary-bright); font-size:10px; font-weight:700;
+}
+.add-foto-btn:active { background:rgba(123,44,255,0.14); }
+.add-foto-btn span { font-size:22px; }
+
+/* DETAIL FOTOS GALLERY */
+.detail-fotos-gallery {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px;
+}
+.detail-foto-item {
+  border-radius:16px; overflow:hidden; position:relative;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);
+}
+.detail-foto-item img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+.detail-foto-dl {
+  position:absolute; bottom:8px; right:8px;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
+  border:none; border-radius:20px; padding:5px 10px;
+  color:#fff; font-size:10px; font-weight:700; cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -647,25 +708,23 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       </div>
     </div>
   </div>
-  <div class="ig">
-    <label>Precio ($)</label>
-    <div class="input-wrap">
-      <span class="input-icon" style="color:var(--success);font-weight:800;">$</span>
-      <input type="number" id="v-precio" placeholder="0.00" step="0.01" inputmode="decimal">
+  <div class="precio-row">
+    <div class="ig">
+      <label>Precio ($)</label>
+      <div class="input-wrap">
+        <span class="input-icon" style="color:var(--success);font-weight:800;">$</span>
+        <input type="number" id="v-precio" placeholder="0.00" step="0.01" inputmode="decimal">
+      </div>
     </div>
+    <button class="btn-precio-rapido" onclick="sumar4()" type="button">
+      $4
+      <span class="bpr-sub">+FOTO</span>
+    </button>
   </div>
   <div class="ig">
-    <label>Foto instantánea <span style="font-size:11px;font-weight:400;opacity:0.6;text-transform:none">(opcional)</span></label>
-    <div class="foto-area" id="foto-area" onclick="triggerCamera('foto-input')">
-      <div class="foto-placeholder">
-        <div class="foto-icon-lg">📷</div>
-        <p>Toca para tomar la foto</p>
-        <span>Usa la cámara de tu iPhone</span>
-      </div>
-      <img class="foto-preview" id="foto-preview" src="" alt="preview">
-      <div class="foto-change" id="foto-change">Cambiar foto</div>
-    </div>
-    <input type="file" id="foto-input" accept="image/*" capture="environment">
+    <label>Fotos del cliente <span style="font-size:11px;font-weight:400;opacity:0.6;text-transform:none">(opcional · varias)</span></label>
+    <div class="fotos-grid" id="fotos-grid"></div>
+    <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none">
   </div>
   <div class="ig no-icon">
     <label>Nota <span style="font-size:11px;font-weight:400;opacity:0.6;text-transform:none">(opcional)</span></label>
@@ -759,10 +818,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <button class="btn-close" onclick="closeDetail()">✕</button>
   </div>
   <div class="modal-content">
-    <div class="detail-img-box" id="d-img-container">
-      <img src="" id="d-foto" alt="Foto" style="display:none;">
-      <div class="no-img" id="d-no-foto">📸</div>
-    </div>
+    <div id="d-fotos-gallery" class="detail-fotos-gallery"></div>
     
     <div class="d-info-block">
       <div class="d-row"><span class="d-lbl">👤 Cliente</span><span class="d-val" id="d-nombre"></span></div>
@@ -774,8 +830,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     </div>
 
     <div class="d-actions">
-      <button class="btn btn-outline" id="btn-dl-foto" onclick="downloadCurrentFoto()">
-        <span style="font-size:18px">💾</span> Descargar Foto
+      <button class="btn btn-outline" id="btn-dl-foto" onclick="downloadTodasFotos()">
+        <span style="font-size:18px">💾</span> Descargar Fotos
       </button>
       <button class="btn btn-wa" onclick="sendWhatsApp()">
         <span style="font-size:18px">💬</span> WhatsApp
@@ -866,19 +922,15 @@ Nos puedes seguir y volver a ser protagonista en nuestros próximos eventos.
 📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸`;
 
 let ST={productos:[],movimientos:[],config:{}};
-let fotoData=null,tipoSel='fisica',pendingDel=null;
-let currentDetailIdx = -1; 
+let fotosData=[]; // array de base64 para la venta actual
+let tipoSel='fisica',pendingDel=null;
+let currentDetailIdx = -1;
 let editFotoData = null;
 let editTipoSel = 'fisica';
 
-/* =========================================================
-   INDEXEDDB — almacena fotos sin límite en iPhone/Safari
-========================================================= */
-const DB_NAME='blinkprint-db';
-const DB_VER=1;
-const STORE='fotos';
+/* ── IndexedDB (fotos sin límite en iPhone/Safari) ── */
+const DB_NAME='blinkprint-db', DB_VER=1, STORE='fotos';
 let db=null;
-
 function openDB(){
   return new Promise((res,rej)=>{
     const req=indexedDB.open(DB_NAME,DB_VER);
@@ -887,41 +939,31 @@ function openDB(){
     req.onerror=e=>rej(e);
   });
 }
-function dbPut(key,val){
-  return new Promise((res,rej)=>{
-    const tx=db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).put(val,key);
-    tx.oncomplete=()=>res();
-    tx.onerror=e=>rej(e);
-  });
-}
-function dbGet(key){
-  return new Promise((res,rej)=>{
-    const tx=db.transaction(STORE,'readonly');
-    const req=tx.objectStore(STORE).get(key);
-    req.onsuccess=e=>res(e.target.result||null);
-    req.onerror=e=>rej(e);
-  });
-}
-function dbDel(key){
-  return new Promise((res,rej)=>{
-    const tx=db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).delete(key);
-    tx.oncomplete=()=>res();
-    tx.onerror=e=>rej(e);
-  });
-}
-function fotoKey(m){return 'foto_'+(m._id||(m.fecha+'_'+m.hora+'_'+(m.nombre||'x').replace(/\W/g,'_')));}
+function dbPut(key,val){return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(val,key);tx.oncomplete=()=>res();tx.onerror=e=>rej(e);});}
+function dbGet(key){return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly');const req=tx.objectStore(STORE).get(key);req.onsuccess=e=>res(e.target.result||null);req.onerror=e=>rej(e);});}
+function dbDel(key){return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(key);tx.oncomplete=()=>res();tx.onerror=e=>rej(e);});}
+function fotoKey(m,i){return 'foto_'+(m._id||m.fecha+'_'+m.hora)+'_'+i;}
 
-async function getFoto(m){
-  if(!m.foto)return null;
-  if(m.foto==='__idb__')return await dbGet(fotoKey(m));
-  return m.foto;
+async function getFotos(m){
+  if(!m.fotos||!m.fotos.length) return [];
+  const arr=[];
+  for(let i=0;i<m.fotos.length;i++){
+    if(m.fotos[i]==='__idb__') arr.push(await dbGet(fotoKey(m,i)));
+    else arr.push(m.fotos[i]);
+  }
+  return arr.filter(Boolean);
 }
-async function setFoto(m,dataUrl){
-  if(!dataUrl){m.foto=null;await dbDel(fotoKey(m));return;}
-  m.foto='__idb__';
-  await dbPut(fotoKey(m),dataUrl);
+async function setFotos(m, dataUrls){
+  // delete old
+  const oldLen = m.fotos ? m.fotos.length : 0;
+  for(let i=0;i<oldLen;i++) await dbDel(fotoKey(m,i));
+  m.fotos=[];
+  for(let i=0;i<dataUrls.length;i++){
+    if(dataUrls[i]){
+      await dbPut(fotoKey(m,i), dataUrls[i]);
+      m.fotos.push('__idb__');
+    }
+  }
 }
 
 async function load(){
@@ -930,20 +972,31 @@ async function load(){
     const r=localStorage.getItem('fc-v3');
     if(r){ST=JSON.parse(r);if(!ST.config)ST.config={};}
   }catch(e){}
-  // Asignar _id a movimientos existentes
   let changed=false;
-  ST.movimientos.forEach((m,i)=>{if(!m._id){m._id=Date.now()+'-'+i;changed=true;}});
-  // Migrar fotos base64 que estén en localStorage a IndexedDB
-  for(const m of ST.movimientos){
-    if(m.foto&&m.foto.startsWith('data:')){
-      await dbPut(fotoKey(m),m.foto);
-      m.foto='__idb__';
+  ST.movimientos.forEach((m,i)=>{
+    if(!m._id){m._id=Date.now()+'-'+i;changed=true;}
+    // migrate old single foto to fotos array
+    if(m.foto!==undefined && !m.fotos){
+      m.fotos = m.foto ? [m.foto] : [];
+      delete m.foto;
       changed=true;
     }
+    if(!m.fotos) m.fotos=[];
+  });
+  // migrate base64 in fotos array to IDB
+  for(const m of ST.movimientos){
+    for(let i=0;i<m.fotos.length;i++){
+      if(m.fotos[i]&&m.fotos[i].startsWith('data:')){
+        await dbPut(fotoKey(m,i), m.fotos[i]);
+        m.fotos[i]='__idb__';
+        changed=true;
+      }
+    }
   }
-  if(!ST.config.waTemplate)ST.config.waTemplate=defaultWaTemplate;
-  if(changed)await save();
+  if(!ST.config.waTemplate) ST.config.waTemplate = defaultWaTemplate;
+  if(changed) await save();
   render();
+  renderFotosGrid();
 }
 async function save(){try{localStorage.setItem('fc-v3',JSON.stringify(ST));}catch(e){console.error('save err',e);}}
 
@@ -995,7 +1048,8 @@ function renderVentas(){
   el.innerHTML='';
   ventas.forEach(v=>{
     const tipoBadge=v.tipoServicio==='digital'?'<span class="badge-tipo badge-dig">📱 Digital</span>':v.tipoServicio==='ambas'?'<span class="badge-tipo badge-amb">✨ Fís + Dig</span>':'<span class="badge-tipo badge-fis">🖼️ Física</span>';
-    const fotoEl=(v.foto&&v.foto!=='__idb__')?`<div class="vc-foto"><img src="${v.foto}" alt="foto"></div>`:(v.foto==='__idb__'?'<div class="vc-foto" style="font-size:20px">🖼️</div>':'<div class="vc-foto" style="font-size:20px">📸</div>');
+    const firstFoto=(v.fotos&&v.fotos[0]&&v.fotos[0]!=='__idb__')?v.fotos[0]:null;
+    const fotoEl=firstFoto?`<div class="vc-foto"><img src="${firstFoto}" alt="foto"></div>`:(v.fotos&&v.fotos.length?'<div class="vc-foto" style="font-size:20px">🖼️</div>':'<div class="vc-foto" style="font-size:20px">📸</div>');
     
     const wrap=document.createElement('div');
     wrap.innerHTML=`
@@ -1007,7 +1061,10 @@ function renderVentas(){
             <div class="vc-meta-row">📞 ${v.telefono||'---'}</div>
             <div>${tipoBadge}</div>
           </div>
-          <div class="vc-price">${fmt(v.total)}</div>
+          <div style="text-align:right">
+            <div class="vc-price">${fmt(v.total)}</div>
+            ${(v.fotos&&v.fotos.length>1)?`<div style="font-size:10px;color:var(--primary-bright);font-weight:700;margin-top:2px;">📷 ${v.fotos.length}</div>`:''}
+          </div>
         </div>
         <div class="vc-bottom">
           <div class="vc-date">${v.fecha} · ${v.hora}${v.nota?` · ${v.nota}`:''}</div>
@@ -1018,18 +1075,51 @@ function renderVentas(){
   });
 }
 
+/* ── Sumar $4 ── */
+function sumar4(){
+  const el=$('v-precio');
+  const actual=parseFloat(el.value)||0;
+  el.value=(actual+4).toFixed(2);
+  // feedback visual
+  el.style.transition='box-shadow 0.15s';
+  el.style.boxShadow='0 0 0 3px rgba(0,255,136,0.35)';
+  setTimeout(()=>el.style.boxShadow='',300);
+}
+
+/* ── Grid de fotos en formulario ── */
+function renderFotosGrid(){
+  const grid=$('fotos-grid');
+  grid.innerHTML='';
+  fotosData.forEach((src,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='foto-thumb-wrap';
+    wrap.innerHTML=`<img src="${src}"><button class="foto-thumb-del" onclick="quitarFoto(${i})">✕</button>`;
+    grid.appendChild(wrap);
+  });
+  // add button
+  const add=document.createElement('div');
+  add.className='add-foto-btn';
+  add.innerHTML='<span>📷</span>+Foto';
+  add.onclick=()=>$('foto-input').click();
+  grid.appendChild(add);
+}
+
+function quitarFoto(i){
+  fotosData.splice(i,1);
+  renderFotosGrid();
+}
+
 async function registrarVenta(){
   const nombre=$('v-nombre').value.trim();const tel=$('v-tel').value.trim();
   const precio=parseFloat($('v-precio').value)||0;const nota=$('v-nota').value.trim();
   if(!nombre){showToast('Ingresa el nombre del cliente',true);return;}
   if(!precio){showToast('Ingresa el precio',true);return;}
-  const mov={tipo:'venta',_id:Date.now()+'-'+Math.random().toString(36).slice(2),nombre,telefono:tel,tipoServicio:tipoSel,total:precio.toFixed(2),nota,foto:null,fecha:today(),hora:hora()};
-  if(fotoData) await setFoto(mov,fotoData);
+  const mov={tipo:'venta',_id:Date.now()+'-'+Math.random().toString(36).slice(2),nombre,telefono:tel,tipoServicio:tipoSel,total:precio.toFixed(2),nota,fotos:[],fecha:today(),hora:hora()};
+  if(fotosData.length) await setFotos(mov, fotosData);
   ST.movimientos.push(mov);
   $('v-nombre').value='';$('v-tel').value='';$('v-precio').value='';$('v-nota').value='';
-  fotoData=null;$('foto-preview').src='';$('foto-preview').style.display='none';
-  $('foto-area').querySelector('.foto-placeholder').style.display='flex';
-  $('foto-change').style.display='none';$('foto-input').value='';
+  fotosData=[];renderFotosGrid();
+  $('foto-input').value='';
   selTipo('fisica','create');await save();render();showToast('\u2713 Venta registrada +'+fmt(precio));
 }
 
@@ -1045,28 +1135,35 @@ function selTipo(t, mode){
 
 function triggerCamera(id){ $(id).click(); }
 
-/* Manejador de fotos general */
-function handlePhotoChange(inputElement, previewElement, phElement, isEdit) {
-  const file=inputElement.files[0];if(!file)return;
+/* ── Comprime imagen a JPEG ── */
+function compressImage(file, cb){
   const reader=new FileReader();
   reader.onload=e=>{
     const img=new Image();
     img.onload=()=>{
-      const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;
-      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
-      const res = canvas.toDataURL('image/jpeg',0.9);
-      $(previewElement).src = res; $(previewElement).style.display='block';
-      if($(phElement)) $(phElement).style.display='none';
-      if(isEdit) editFotoData = res;
-      else {
-        fotoData = res;
-        $('foto-change').style.display='block';
-      }
+      const MAX=1200;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg',0.82));
     };img.src=e.target.result;
   };reader.readAsDataURL(file);
 }
-$('foto-input').addEventListener('change', function(){ handlePhotoChange(this, 'foto-preview', '.foto-placeholder', false); });
-$('e-foto-input').addEventListener('change', function(){ handlePhotoChange(this, 'e-foto-preview', 'e-foto-ph', true); });
+
+$('foto-input').addEventListener('change', function(){
+  const file=this.files[0];if(!file)return;
+  compressImage(file, res=>{
+    fotosData.push(res);
+    renderFotosGrid();
+  });
+  this.value='';
+});
+$('e-foto-input').addEventListener('change', function(){
+  const file=this.files[0];if(!file)return;
+  compressImage(file, res=>{ editFotoData=res; $('e-foto-preview').src=res; $('e-foto-preview').style.display='block'; $('e-foto-ph').style.display='none'; });
+  this.value='';
+});
 
 
 /* =========================================================
@@ -1076,30 +1173,34 @@ async function openDetail(idx) {
   const v = ST.movimientos[idx];
   if(!v) return;
   currentDetailIdx = idx;
-  
-  // Fill Info
+
   $('d-nombre').textContent = v.nombre || 'Sin nombre';
   $('d-tel').textContent = v.telefono || 'Sin teléfono';
   $('d-fecha').textContent = `${v.fecha} a las ${v.hora}`;
   $('d-nota').textContent = v.nota || '---';
   $('d-total').textContent = fmt(v.total);
-  
+
   let tipoText = '🖼️ Física';
   if(v.tipoServicio==='digital') tipoText = '📱 Digital';
   if(v.tipoServicio==='ambas') tipoText = '✨ Física + Digital';
   $('d-tipo').textContent = tipoText;
 
-  // Image — cargar desde IndexedDB si aplica
-  const fotoSrc = await getFoto(v);
-  if(fotoSrc) {
-    $('d-foto').src = fotoSrc;
-    $('d-foto').style.display = 'block';
-    $('d-no-foto').style.display = 'none';
+  // Gallery
+  const gallery = $('d-fotos-gallery');
+  gallery.innerHTML = '';
+  const srcs = await getFotos(v);
+  if(srcs.length){
+    srcs.forEach((src,i)=>{
+      const item = document.createElement('div');
+      item.className = 'detail-foto-item';
+      const safeName=(v.nombre||'cliente').replace(/[^a-z0-9]/gi,'_');
+      item.innerHTML=`<img src="${src}"><button class="detail-foto-dl" onclick="downloadFoto('${src}','BlinkPrint_${safeName}_${i+1}.jpg')">💾</button>`;
+      gallery.appendChild(item);
+    });
     $('btn-dl-foto').disabled = false;
     $('btn-dl-foto').style.opacity = '1';
   } else {
-    $('d-foto').style.display = 'none';
-    $('d-no-foto').style.display = 'block';
+    gallery.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">📸 Sin fotos</div>';
     $('btn-dl-foto').disabled = true;
     $('btn-dl-foto').style.opacity = '0.5';
   }
@@ -1112,8 +1213,8 @@ function closeDetail() { $('modal-detalle').classList.remove('show'); currentDet
 function confirmDeleteCurrent() { $('d-confirm-delete').classList.add('show'); }
 async function deleteCurrentVenta() {
   if(currentDetailIdx > -1) {
-    const v = ST.movimientos[currentDetailIdx];
-    if(v && v.foto === '__idb__') await dbDel(fotoKey(v));
+    const v=ST.movimientos[currentDetailIdx];
+    if(v&&v.fotos) for(let i=0;i<v.fotos.length;i++) await dbDel(fotoKey(v,i));
     ST.movimientos.splice(currentDetailIdx, 1);
     await save(); render(); closeDetail(); showToast('Venta eliminada', true);
   }
@@ -1124,30 +1225,33 @@ async function deleteCurrentVenta() {
 ========================================================= */
 function dataURLtoBlob(dataURL){const arr=dataURL.split(',');const mime=arr[0].match(/:(.*?);/)[1];const bstr=atob(arr[1]);let n=bstr.length;const u8arr=new Uint8Array(n);while(n--)u8arr[n]=bstr.charCodeAt(n);return new Blob([u8arr],{type:mime});}
 
-async function downloadCurrentFoto() {
-  const v = ST.movimientos[currentDetailIdx];
-  if(!v) return;
-  const fotoSrc = await getFoto(v);
-  if(!fotoSrc) return;
-  
-  const safeName = (v.nombre || 'cliente').replace(/[^a-z0-9]/gi, '_').replace(/\s+/g,'_');
-  const fileName = 'BlinkPrint_' + safeName + '.jpg';
-  
+async function downloadFoto(src, fileName){
+  if(!src) return;
   try{
-    const blob=dataURLtoBlob(fotoSrc);const file=new File([blob],fileName,{type:'image/jpeg'});
+    const blob=dataURLtoBlob(src);const file=new File([blob],fileName,{type:'image/jpeg'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:'Foto Blink&Print'});
-        showToast('Foto compartida ✓');
+      await navigator.share({files:[file],title:'Foto Blink&Print'});
+      showToast('Foto compartida ✓');
     } else {
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');
-        a.href=url; a.download=fileName; a.click();
-        setTimeout(()=>URL.revokeObjectURL(url),1000);
-        showToast('Descargando...');
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=fileName;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      showToast('Descargando...');
     }
   }catch(e){
-    const a=document.createElement('a');
-    a.href=fotoSrc; a.download=fileName; a.click();
+    const a=document.createElement('a');a.href=src;a.download=fileName;a.click();
+  }
+}
+
+async function downloadTodasFotos(){
+  const v=ST.movimientos[currentDetailIdx];
+  if(!v)return;
+  const srcs=await getFotos(v);
+  if(!srcs.length){showToast('Sin fotos',true);return;}
+  const safeName=(v.nombre||'cliente').replace(/[^a-z0-9]/gi,'_');
+  for(let i=0;i<srcs.length;i++){
+    await new Promise(r=>setTimeout(r,400*i));
+    await downloadFoto(srcs[i],'BlinkPrint_'+safeName+'_'+(i+1)+'.jpg');
   }
 }
 
@@ -1174,16 +1278,15 @@ function sendWhatsApp() {
 async function openEdit() {
   const v = ST.movimientos[currentDetailIdx];
   if(!v) return;
-  
   $('e-nombre').value = v.nombre || '';
   $('e-tel').value = v.telefono || '';
   $('e-precio').value = v.total || '';
   $('e-nota').value = v.nota || '';
-  
   selTipo(v.tipoServicio || 'fisica', 'edit');
-  editFotoData = await getFoto(v);
-  
-  if(editFotoData) {
+  // show first foto in edit preview
+  const srcs = await getFotos(v);
+  editFotoData = srcs[0] || null;
+  if(editFotoData){
     $('e-foto-preview').src = editFotoData;
     $('e-foto-preview').style.display = 'block';
     $('e-foto-ph').style.display = 'none';
@@ -1191,7 +1294,6 @@ async function openEdit() {
     $('e-foto-preview').style.display = 'none';
     $('e-foto-ph').style.display = 'flex';
   }
-  
   $('modal-editar').classList.add('show');
 }
 
@@ -1200,21 +1302,23 @@ function closeEdit() { $('modal-editar').classList.remove('show'); }
 async function saveEdit() {
   const nombre = $('e-nombre').value.trim();
   const precio = parseFloat($('e-precio').value)||0;
-  
-  if(!nombre) { showToast('Ingresa el nombre', true); return; }
-  if(!precio) { showToast('Ingresa el precio', true); return; }
-  
+  if(!nombre){showToast('Ingresa el nombre',true);return;}
+  if(!precio){showToast('Ingresa el precio',true);return;}
   const v = ST.movimientos[currentDetailIdx];
   v.nombre = nombre;
   v.telefono = $('e-tel').value.trim();
   v.total = precio.toFixed(2);
   v.nota = $('e-nota').value.trim();
   v.tipoServicio = editTipoSel;
-  await setFoto(v, editFotoData);
-  
+  // update only first foto if changed, keep rest
+  if(editFotoData){
+    const existing = await getFotos(v);
+    existing[0] = editFotoData;
+    await setFotos(v, existing);
+  }
   await save(); render();
-  closeEdit(); 
-  openDetail(currentDetailIdx); // Refresh detail view
+  closeEdit();
+  openDetail(currentDetailIdx);
   showToast('Cambios guardados ✓');
 }
 
