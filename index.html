@@ -1217,13 +1217,43 @@ async function deleteCurrentVenta() {
 /* =========================================================
    DESCARGA FOTO y WHATSAPP
 ========================================================= */
-/* =========================================================
-   DESCARGA Y COMPARTIR FOTO (Versión mejorada para alta calidad)
-========================================================= */
+/* --- 1. Lógica para capturar y previsualizar (Sin errores de memoria) --- */
+$('foto-input').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
 
-// Función auxiliar para convertir base64 a blob solo si es necesario
-function base64ToBlob(base64) {
-  const arr = base64.split(',');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      // Mantenemos tamaño real pero aseguramos formato JPEG limpio
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      // Calidad 0.95: Visualmente perfecta pero elimina metadatos corruptos de iPhone
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      
+      fotoData = dataUrl;
+      $('foto-preview').src = dataUrl;
+      $('foto-preview').style.display = 'block';
+      
+      const placeholder = $('foto-area').querySelector('.foto-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      const btnChange = $('foto-change');
+      if (btnChange) btnChange.style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+/* --- 2. Lógica de Descarga Optimizada --- */
+function dataURLtoBlob(dataURL) {
+  const arr = dataURL.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
   const bstr = atob(arr[1]);
   let n = bstr.length;
@@ -1235,50 +1265,19 @@ function base64ToBlob(base64) {
 async function downloadFoto(src, fileName) {
   if (!src) return;
   try {
-    let blob;
-    // Si la imagen es base64, la convertimos. Si ya es una URL, la descargamos
-    if (src.startsWith('data:')) {
-      blob = base64ToBlob(src);
-    } else {
-      const response = await fetch(src);
-      blob = await response.blob();
-    }
-    
+    const blob = dataURLtoBlob(src);
     const file = new File([blob], fileName, { type: 'image/jpeg' });
     
-    // Compartir nativo de iOS
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Foto Blink&Print' });
-      showToast('Foto compartida ✓');
+      await navigator.share({ files: [file] });
     } else {
-      // Descarga directa si no puede compartir
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
       a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      showToast('Descargando...');
     }
-  } catch (e) {
-    console.error("Error en downloadFoto:", e);
-    // Fallback: intentar abrir en ventana nueva
-    window.open(src, '_blank');
-  }
-}
-
-async function downloadTodasFotos() {
-  const v = ST.movimientos[currentDetailIdx];
-  if (!v) return;
-  const srcs = await getFotos(v);
-  if (!srcs.length) { showToast('Sin fotos', true); return; }
-  
-  const safeName = (v.nombre || 'cliente').replace(/[^a-z0-9]/gi, '_');
-  
-  for (let i = 0; i < srcs.length; i++) {
-    await new Promise(r => setTimeout(r, 600)); // Un poco más de espera entre fotos para no saturar
-    await downloadFoto(srcs[i], `BlinkPrint_${safeName}_${i + 1}.jpg`);
-  }
+  } catch(e) { window.open(src, '_blank'); }
 }
 
 function sendWhatsApp() {
