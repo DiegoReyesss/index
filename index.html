@@ -670,6 +670,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1025,6 +1026,27 @@ let currentDetailIdx = -1;
 let editFotoData = null;
 let editTipoSel = 'fisica';
 let ventaQty = 0; // Cantidad a descontar en venta actual
+
+// === INICIALIZAR CONEXIÓN A LA NUBE (SUPABASE) ===
+const supabaseUrl = 'PEGA_AQUÍ_TU_PROJECT_URL';
+const supabaseKey = 'PEGA_AQUÍ_TU_ANON_KEY';
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function probarConexion() {
+  console.log("Intentando conectar a Supabase...");
+  const { data, error } = await _supabase.from('productos').select('*');
+  
+  if (error) {
+    console.error("❌ Error de conexión:", error.message);
+    showToast("Error de conexión a la nube", true); // Usa tu toast rojo
+  } else {
+    console.log("✅ ¡Conexión exitosa! Productos leídos:", data);
+    showToast("¡Conectado a la nube exitosamente!"); // Usa tu toast verde
+  }
+}
+// Hacemos que la prueba corra solita 1.5 segundos después de abrir la app
+setTimeout(probarConexion, 1500);
+// ================================================
 
 /* ── IndexedDB (fotos sin límite en iPhone/Safari) ── */
 const DB_NAME='blinkprint-db', DB_VER=1, STORE='fotos';
@@ -1694,57 +1716,6 @@ function addGasto(){
   $('g-desc').value='';$('g-monto').value='';save();render();showToast('Gasto registrado -'+fmt(monto));
 }
 
-function renderResumen(){
-  const hoy=today();const movs=ST.movimientos.filter(m=>m.fecha===hoy);
-  const tv=movs.filter(m=>m.tipo==='venta').reduce((a,m)=>a+parseFloat(m.total),0);
-  const tg=movs.filter(m=>m.tipo==='gasto').reduce((a,m)=>a+parseFloat(m.total),0);
-  const gan=tv-tg;
-  $('r-ganancia').textContent=fmt(gan);$('r-ganancia').style.color=gan>=0?'var(--warning)':'var(--danger)';
-  $('r-ventas').textContent=fmt(tv);$('r-gastos').textContent=fmt(tg);
-  $('r-count').textContent=movs.filter(m=>m.tipo==='venta').length;$('r-stock').textContent=ST.productos.length;
-  const alertas=ST.productos.filter(p=>p.stock<=(p.minimo||5));
-  $('r-alertas').innerHTML=alertas.length?alertas.map(p=>`<div class="mov-item"><div class="mov-left"><div class="mov-icon" style="color:var(--warning)">⚠️</div><div><div class="mov-desc">${p.nombre}</div><div class="mov-sub">Quedan ${p.stock} u.</div></div></div></div>`).join(''):'<div class="glass" style="padding:16px;border-radius:16px;color:var(--text-sec);font-size:13px;text-align:center;font-weight:600;">✅ Inventario en niveles óptimos</div>';
-  const ult=[...ST.movimientos].reverse().slice(0,5);
-  $('r-historial').innerHTML=ult.length?ult.map(m=>`<div class="mov-item" style="padding:12px 14px"><div class="mov-left"><div class="mov-icon" style="font-size:14px">${m.tipo==='venta'?'↗':'↘'}</div><div><div class="mov-desc">${m.tipo==='venta'?(m.nombre||'Venta'):m.desc}</div><div class="mov-sub">${m.fecha}</div></div></div><div class="mov-amt" style="color:${m.tipo==='gasto'?'var(--danger)':'var(--success)'}">${m.tipo==='gasto'?'-':'+'}${fmt(m.total)}</div></div>`).join(''):'<div class="glass" style="padding:16px;border-radius:16px;color:var(--text-sec);font-size:13px;text-align:center;font-weight:600;">Sin movimientos recientes</div>';
-}
-
-function checkDots(){if($('dot-stock'))$('dot-stock').style.display=ST.productos.some(p=>p.stock<=(p.minimo||5))?'block':'none';}
-function cancelDel(){if(pendingDel){const bar=$(pendingDel);if(bar)bar.classList.remove('show');pendingDel=null;}}
-
-function showToast(msg,err){
-  const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',2400);
-}
-
-function exportar(){
-  const hoy=today();const movs=ST.movimientos.filter(m=>m.fecha===hoy);
-  const tv=movs.filter(m=>m.tipo==='venta').reduce((a,m)=>a+parseFloat(m.total),0);
-  const tg=movs.filter(m=>m.tipo==='gasto').reduce((a,m)=>a+parseFloat(m.total),0);
-  let txt=`BLINK&PRINT - ${hoy}\n${'='.repeat(30)}\nVentas:   ${fmt(tv)}\nGastos:   ${fmt(tg)}\nGanancia: ${fmt(tv-tg)}\n\nVENTAS:\n`;
-  movs.filter(m=>m.tipo==='venta').forEach(v=>txt+=`${v.hora}  ${v.nombre||'?'} | ${v.telefono||'sin tel'} | ${v.tipoServicio} | ${fmt(v.total)}${v.nota?' | '+v.nota:''}\n`);
-  txt+=`\nGASTOS:\n`;
-  movs.filter(m=>m.tipo==='gasto').forEach(g=>txt+=`${g.hora}  ${g.desc} (${g.categoria}): ${fmt(g.total)}\n`);
-  const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download=`blink-print-${hoy}.txt`;a.click();
-}
-
-load();
-if(window.lucide) lucide.createIcons();
-ST.movimientos.push({
-    tipo: 'gasto',
-    desc: desc,
-    total: monto.toFixed(2),
-    categoria: $('g-cat').value,
-    fecha: today(),
-    hora: hora()
-  });
-  
-  $('g-desc').value = '';
-  $('g-monto').value = '';
-  save();
-  render();
-  showToast('Gasto registrado ✓');
-}
-
 /* ── Resumen y herramientas ── */
 function renderResumen() {
   const hoy = today();
@@ -1764,13 +1735,13 @@ function renderResumen() {
   // Alertas stock
   const alertas = ST.productos.filter(p => p.stock <= (p.minimo || 5));
   $('r-alertas').innerHTML = alertas.length ? 
-    alertas.map(p => `<div class="mov-item" style="border-left:4px solid var(--warning)">${p.nombre} <span style="font-weight:800">${p.stock}</span></div>`).join('') :
+    alertas.map(p => `<div class="mov-item" style="border-left:4px solid var(--warning)"><div class="mov-left"><div class="mov-icon" style="color:var(--warning)">⚠️</div><div><div class="mov-desc">${p.nombre}</div><div class="mov-sub">Quedan ${p.stock} u.</div></div></div></div>`).join('') :
     '<div class="empty"><p>Sin alertas de stock</p></div>';
 
   // Historial resumido
   const hist = movs.slice(-5).reverse();
   $('r-historial').innerHTML = hist.length ?
-    hist.map(m => `<div class="mov-item">${m.tipo === 'venta' ? '📸 Venta: ' + m.nombre : '📉 Gasto: ' + m.desc} <span style="font-weight:800">${m.tipo === 'venta' ? '+' : '-'}${fmt(m.total)}</span></div>`).join('') :
+    hist.map(m => `<div class="mov-item"><div class="mov-left"><div class="mov-icon" style="font-size:14px">${m.tipo==='venta'?'↗':'↘'}</div><div><div class="mov-desc">${m.tipo === 'venta' ? m.nombre : m.desc}</div><div class="mov-sub">${m.fecha}</div></div></div> <div class="mov-amt" style="color:${m.tipo==='gasto'?'var(--danger)':'var(--success)'}">${m.tipo === 'venta' ? '+' : '-'}${fmt(m.total)}</div></div>`).join('') :
     '<div class="empty"><p>Sin movimientos hoy</p></div>';
 }
 
@@ -1791,7 +1762,7 @@ function showToast(msg, isErr=false){
 
 function checkDots() {
   const lowStock = ST.productos.some(p => p.stock <= (p.minimo || 5));
-  $('dot-stock').style.display = lowStock ? 'block' : 'none';
+  if($('dot-stock')) $('dot-stock').style.display = lowStock ? 'block' : 'none';
 }
 
 // Iniciar aplicación
@@ -1799,6 +1770,3 @@ window.onload = load;
 </script>
 </body>
 </html>
-  
-
-
