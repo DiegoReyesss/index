@@ -1135,37 +1135,27 @@ function selTipo(t, mode){
 
 function triggerCamera(id){ $(id).click(); }
 
-// Función para leer la imagen sin perder absolutamente nada de calidad
-function readOriginalImage(file, cb) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    cb(e.target.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-// Evento que se dispara al tomar la foto
+// Usamos Blob para manejar fotos pesadas sin saturar la memoria
 $('foto-input').addEventListener('change', function() {
   const file = this.files[0]; 
   if (!file) return;
   
-  readOriginalImage(file, res => {
-    // Guardamos la foto original en calidad nativa
-    fotoData = res; 
-    
-    // Mostramos la previsualización en la app
-    $('foto-preview').src = res;
-    $('foto-preview').style.display = 'block';
-    
-    // Ocultamos el placeholder y mostramos el de cambiar foto
-    const placeholder = $('foto-area').querySelector('.foto-placeholder');
-    if (placeholder) placeholder.style.display = 'none';
-    
-    const btnChange = $('foto-change');
-    if (btnChange) btnChange.style.display = 'block';
-  });
+  // Convertimos el archivo a un Blob URL (más ligero para la app)
+  const objectUrl = URL.createObjectURL(file);
   
-  // Reseteamos el input
+  // Guardamos el objeto directamente
+  fotoData = objectUrl; 
+  
+  // Visualización
+  $('foto-preview').src = objectUrl;
+  $('foto-preview').style.display = 'block';
+  
+  const placeholder = $('foto-area').querySelector('.foto-placeholder');
+  if (placeholder) placeholder.style.display = 'none';
+  
+  const btnChange = $('foto-change');
+  if (btnChange) btnChange.style.display = 'block';
+  
   this.value = '';
 });
 
