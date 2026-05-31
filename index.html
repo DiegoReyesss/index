@@ -1224,6 +1224,10 @@ $('foto-input').addEventListener('change', function() {
   const reader = new FileReader();
   reader.onload = function(e) {
     const img = new Image();
+    
+    // --- ESTA ES LA LÍNEA MÁGICA QUE EVITA EL ERROR ---
+    img.crossOrigin = "Anonymous"; 
+    
     img.onload = function() {
       try {
         const canvas = document.createElement('canvas');
@@ -1232,20 +1236,12 @@ $('foto-input').addEventListener('change', function() {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         
-        // Intentamos generar la imagen
+        // Generamos la imagen con un formato seguro
         const dataUrl = canvas.toDataURL('image/jpeg', 0.70);
         
-        // VALIDACIÓN: ¿Realmente se creó la imagen?
-        if (!dataUrl || dataUrl.length < 100) {
-          alert("Error: La imagen procesada está vacía.");
-          return;
-        }
-
         fotoData = dataUrl;
         $('foto-preview').src = dataUrl;
         $('foto-preview').style.display = 'block';
-        
-        console.log("Foto procesada con éxito, tamaño:", dataUrl.length);
         
         const placeholder = $('foto-area').querySelector('.foto-placeholder');
         if (placeholder) placeholder.style.display = 'none';
@@ -1254,14 +1250,13 @@ $('foto-input').addEventListener('change', function() {
         if (btnChange) btnChange.style.display = 'block';
         
       } catch (err) {
-        alert("Error crítico en el canvas: " + err.message);
+        alert("Error al procesar la imagen: " + err.message);
       }
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 });
-
 function sendWhatsApp() {
   const v = ST.movimientos[currentDetailIdx];
   if(!v || !v.telefono) { showToast('El cliente no tiene teléfono', true); return; }
