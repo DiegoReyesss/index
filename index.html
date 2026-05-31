@@ -1233,8 +1233,8 @@ $('foto-input').addEventListener('change', function() {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
       
-      // Calidad 0.95: Visualmente perfecta pero elimina metadatos corruptos de iPhone
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      // Calidad 0.85: Visualmente perfecta pero elimina metadatos corruptos de iPhone
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       
       fotoData = dataUrl;
       $('foto-preview').src = dataUrl;
