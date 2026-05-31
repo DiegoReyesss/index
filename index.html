@@ -629,7 +629,35 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   border:none; border-radius:20px; padding:5px 10px;
   color:#fff; font-size:10px; font-weight:700; cursor:pointer;
 }
+
+/* UI SIZE SLIDER */
+.ui-size-row { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+.ui-size-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); font-weight:600; }
+.ui-size-slider {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:6px; border-radius:10px;
+  background:linear-gradient(90deg, var(--primary-bright), var(--accent));
+  outline:none; cursor:pointer;
+}
+.ui-size-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:24px; height:24px; border-radius:50%;
+  background:#fff; border:3px solid var(--primary-bright);
+  box-shadow:0 2px 8px rgba(123,44,255,0.4); cursor:pointer;
+}
+/* EXPORT ZIP BUTTON */
+.btn-export-zip {
+  width:100%; padding:16px; border-radius:var(--r-card);
+  background:linear-gradient(135deg,rgba(255,180,0,0.12),rgba(255,120,0,0.08));
+  border:1px solid rgba(255,180,0,0.3); color:#ffb400;
+  font-size:15px; font-weight:800; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-family:'DM Sans',sans-serif; transition:all var(--trans-fast);
+  margin-top:10px;
+}
+.btn-export-zip:active { transform:scale(0.97); background:rgba(255,180,0,0.2); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -891,6 +919,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <button class="btn-close" onclick="closeConfig()">✕</button>
   </div>
   <div class="modal-content">
+
+    <div class="sec-title">🔡 <span>Tamaño de pantalla</span></div>
+    <div class="ui-size-row">
+      <input type="range" class="ui-size-slider" id="ui-size-slider" min="1" max="3" step="1" value="2" oninput="previewSize(this.value)">
+      <div class="ui-size-labels">
+        <span>Pequeño</span>
+        <span>Normal</span>
+        <span>Grande</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveUiSize()" style="margin-bottom:28px;">✓ Aplicar tamaño</button>
+
     <div class="sec-title">💬 <span>Plantilla WhatsApp</span></div>
     <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.4;">
       El mensaje se enviará automáticamente al cliente. Usa las variables: <br>
@@ -900,6 +940,15 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <textarea id="config-wa-template"></textarea>
     </div>
     <button class="btn btn-primary" onclick="saveConfig()">💾 Guardar Plantilla</button>
+
+    <div class="sec-title" style="margin-top:28px;">📦 <span>Exportar ventas del día</span></div>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.4;">
+      Genera un archivo .zip con el resumen de ventas y todas las fotos de los clientes del día.
+    </p>
+    <button class="btn-export-zip" onclick="exportarZip()">
+      <span style="font-size:20px">📦</span> Guardar resumen de ventas
+    </button>
+
   </div>
 </div>
 
@@ -991,6 +1040,9 @@ async function load(){
   if(changed) await save();
   render();
   renderFotosGrid();
+  // apply saved ui size
+  applyUiSize(ST.config.uiSize || 2);
+  const slEl=$('ui-size-slider'); if(slEl) slEl.value=ST.config.uiSize||2;
 }
 async function save(){try{localStorage.setItem('fc-v3',JSON.stringify(ST));}catch(e){console.error('save err',e);}}
 
@@ -1319,14 +1371,103 @@ async function saveEdit() {
 /* =========================================================
    CONFIGURACIÓN (WHATSAPP)
 ========================================================= */
-function openConfig() {
+
+function closeConfig() { $('modal-config').classList.remove('show'); }
+/* ── UI SIZE ── */
+const UI_SIZES = {
+  1: { base:'13px', formMax:'480px' },
+  2: { base:'16px', formMax:'560px' },
+  3: { base:'19px', formMax:'640px' }
+};
+
+function applyUiSize(level){
+  const s = UI_SIZES[level] || UI_SIZES[2];
+  document.documentElement.style.fontSize = s.base;
+  const form = document.querySelector('.app-form');
+  if(form) form.style.maxWidth = s.formMax;
+}
+
+function previewSize(val){
+  applyUiSize(parseInt(val));
+}
+
+function saveUiSize(){
+  const val = parseInt($('ui-size-slider').value);
+  ST.config.uiSize = val;
+  applyUiSize(val);
+  save();
+  showToast('Tamaño guardado ✓');
+}
+
+function openConfig(){
   $('config-wa-template').value = ST.config.waTemplate || defaultWaTemplate;
+  const sz = ST.config.uiSize || 2;
+  $('ui-size-slider').value = sz;
   $('modal-config').classList.add('show');
 }
-function closeConfig() { $('modal-config').classList.remove('show'); }
+
 function saveConfig() {
   ST.config.waTemplate = $('config-wa-template').value;
   save(); closeConfig(); showToast('Configuración guardada ✓');
+}
+
+/* ── EXPORT ZIP ── */
+async function exportarZip(){
+  const hoy = today();
+  const ventasHoy = ST.movimientos.filter(m => m.tipo==='venta' && m.fecha===hoy);
+  if(!ventasHoy.length){ showToast('No hay ventas hoy', true); return; }
+
+  showToast('⏳ Generando ZIP...');
+
+  try{
+    const zip = new JSZip();
+    const fotosFolder = zip.folder('fotos');
+
+    // Text summary
+    let txt = `BLINK&PRINT — Resumen de ventas ${hoy}\n`;
+    txt += '='.repeat(40) + '\n\n';
+    let totalDia = 0;
+    for(const v of ventasHoy){
+      txt += `Cliente : ${v.nombre || 'Sin nombre'}\n`;
+      txt += `Teléfono: ${v.telefono || '---'}\n`;
+      txt += `Servicio: ${v.tipoServicio || '---'}\n`;
+      txt += `Total   : $${v.total}\n`;
+      txt += `Hora    : ${v.hora}\n`;
+      txt += `Nota    : ${v.nota || '---'}\n`;
+      txt += `Fotos   : ${v.fotos ? v.fotos.length : 0}\n`;
+      txt += '-'.repeat(30) + '\n';
+      totalDia += parseFloat(v.total)||0;
+    }
+    txt += `\nTOTAL DEL DÍA: $${totalDia.toFixed(2)}\n`;
+    txt += `Ventas realizadas: ${ventasHoy.length}\n`;
+    zip.file(`resumen_${hoy}.txt`, txt);
+
+    // Photos
+    for(const v of ventasHoy){
+      const srcs = await getFotos(v);
+      const safeName = (v.nombre || 'cliente').replace(/[^a-z0-9]/gi, '_').replace(/_+/g,'_');
+      for(let i=0; i<srcs.length; i++){
+        const src = srcs[i];
+        if(!src) continue;
+        // base64 to binary
+        const b64 = src.split(',')[1];
+        const fname = srcs.length===1 ? `${safeName}.jpg` : `${safeName}_${i+1}.jpg`;
+        fotosFolder.file(fname, b64, {base64:true});
+      }
+    }
+
+    const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `BlinkPrint_${hoy}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    showToast('✓ ZIP generado — gúrdalo en Archivos');
+  } catch(e){
+    console.error(e);
+    showToast('Error al generar ZIP', true);
+  }
 }
 
 /* =========================================================
