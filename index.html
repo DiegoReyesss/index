@@ -1729,6 +1729,76 @@ function exportar(){
 
 load();
 if(window.lucide) lucide.createIcons();
+ST.movimientos.push({
+    tipo: 'gasto',
+    desc: desc,
+    total: monto.toFixed(2),
+    categoria: $('g-cat').value,
+    fecha: today(),
+    hora: hora()
+  });
+  
+  $('g-desc').value = '';
+  $('g-monto').value = '';
+  save();
+  render();
+  showToast('Gasto registrado ✓');
+}
+
+/* ── Resumen y herramientas ── */
+function renderResumen() {
+  const hoy = today();
+  const movs = ST.movimientos.filter(m => m.fecha === hoy);
+  const ventas = movs.filter(m => m.tipo === 'venta');
+  const gastos = movs.filter(m => m.tipo === 'gasto');
+  
+  const totalV = ventas.reduce((a, m) => a + parseFloat(m.total), 0);
+  const totalG = gastos.reduce((a, m) => a + parseFloat(m.total), 0);
+  
+  $('r-ganancia').textContent = fmt(totalV - totalG);
+  $('r-ventas').textContent = fmt(totalV);
+  $('r-gastos').textContent = fmt(totalG);
+  $('r-count').textContent = ventas.length;
+  $('r-stock').textContent = ST.productos.length;
+
+  // Alertas stock
+  const alertas = ST.productos.filter(p => p.stock <= (p.minimo || 5));
+  $('r-alertas').innerHTML = alertas.length ? 
+    alertas.map(p => `<div class="mov-item" style="border-left:4px solid var(--warning)">${p.nombre} <span style="font-weight:800">${p.stock}</span></div>`).join('') :
+    '<div class="empty"><p>Sin alertas de stock</p></div>';
+
+  // Historial resumido
+  const hist = movs.slice(-5).reverse();
+  $('r-historial').innerHTML = hist.length ?
+    hist.map(m => `<div class="mov-item">${m.tipo === 'venta' ? '📸 Venta: ' + m.nombre : '📉 Gasto: ' + m.desc} <span style="font-weight:800">${m.tipo === 'venta' ? '+' : '-'}${fmt(m.total)}</span></div>`).join('') :
+    '<div class="empty"><p>Sin movimientos hoy</p></div>';
+}
+
+function cancelDel() {
+  if(pendingDel) {
+    const bar = $(pendingDel);
+    if(bar) bar.classList.remove('show');
+    pendingDel = null;
+  }
+}
+
+function showToast(msg, isErr=false){
+  const t=$('toast');
+  t.textContent=msg;
+  t.className='toast'+(isErr?' err':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function checkDots() {
+  const lowStock = ST.productos.some(p => p.stock <= (p.minimo || 5));
+  $('dot-stock').style.display = lowStock ? 'block' : 'none';
+}
+
+// Iniciar aplicación
+window.onload = load;
 </script>
 </body>
 </html>
+  
+
+
