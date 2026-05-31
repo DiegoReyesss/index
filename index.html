@@ -495,6 +495,17 @@ input[type=file]{display:none;}
   animation:pulseDot 2s infinite;
 }
 
+/* BOTON QR ESPECIAL */
+.qr-special-icon {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(123,44,255,0.4);
+  transform: translateY(-5px);
+}
+.nav-btn:active .qr-special-icon {
+  transform: translateY(-2px) scale(0.95);
+}
+
 /* TOAST */
 .toast {
   position:fixed; top:110px; left:50%;
@@ -570,7 +581,7 @@ input[type=file]{display:none;}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 /* BOTON $4 */
-.precio-row { display:flex; gap:10px; align-items:flex-end; }
+.precio-row { display:flex; gap:10px; align-items:flex-end; margin-bottom:18px; }
 .precio-row .ig { flex:1; margin-bottom:0; }
 .btn-precio-rapido {
   height:52px; min-width:72px; padding:0 16px;
@@ -636,7 +647,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .ui-size-slider {
   -webkit-appearance:none; appearance:none;
   width:100%; height:6px; border-radius:10px;
-  background:linear-gradient(90deg, var(--primary-bright), var(--accent));
+  background:linear-gradient(90deg, var(--primary-bright), var(--primary));
   outline:none; cursor:pointer;
 }
 .ui-size-slider::-webkit-slider-thumb {
@@ -658,6 +669,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .btn-export-zip:active { transform:scale(0.97); background:rgba(255,180,0,0.2); }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -666,15 +678,15 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div class="header">
   <div class="header-top">
     <div class="logo-group">
-      <div class="logo-icon">📸</div>
+      <div class="logo-icon"><i data-lucide="camera" style="width:26px;height:26px;stroke-width:1.5;"></i></div>
       <div class="logo-text-group">
         <div class="logo-title">Blink&amp;Print</div>
-        <div class="logo-sub">Registra una nueva venta ✨</div>
+        <div class="logo-sub">Registra una nueva venta</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="date-pill">📅 <span id="lbl-date"></span></div>
-      <button class="settings-btn" onclick="openConfig()">⚙️</button>
+      <div class="date-pill"><i data-lucide="calendar" style="width:13px;height:13px;stroke-width:2;"></i> <span id="lbl-date"></span></div>
+      <button class="settings-btn" onclick="openConfig()"><i data-lucide="settings" style="width:20px;height:20px;stroke-width:2;"></i></button>
     </div>
   </div>
   <div class="stats-grid">
@@ -697,25 +709,25 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="goTab('ventas')" id="tab-ventas">📸 Ventas</button>
-  <button class="tab" onclick="goTab('stock')" id="tab-stock">📦 Stock</button>
-  <button class="tab" onclick="goTab('gastos')" id="tab-gastos">💸 Gastos</button>
-  <button class="tab" onclick="goTab('resumen')" id="tab-resumen">📊 Resumen</button>
+  <button class="tab active" onclick="goTab('ventas')" id="tab-ventas"><i data-lucide="camera" style="width:14px;height:14px;stroke-width:2;"></i> Ventas</button>
+  <button class="tab" onclick="goTab('stock')" id="tab-stock"><i data-lucide="package" style="width:14px;height:14px;stroke-width:2;"></i> Stock</button>
+  <button class="tab" onclick="goTab('gastos')" id="tab-gastos"><i data-lucide="trending-down" style="width:14px;height:14px;stroke-width:2;"></i> Gastos</button>
+  <button class="tab" onclick="goTab('resumen')" id="tab-resumen"><i data-lucide="bar-chart-2" style="width:14px;height:14px;stroke-width:2;"></i> Resumen</button>
 </div>
 
 <div class="page active" id="page-ventas">
-  <div class="sec-title">📋 <span>Nueva venta</span></div>
+  <div class="sec-title"><i data-lucide="plus-circle" style="width:16px;height:16px;stroke-width:2;"></i> <span>Nueva venta</span></div>
   <div class="ig">
     <label>Nombre del cliente</label>
     <div class="input-wrap">
-      <span class="input-icon">👤</span>
+      <span class="input-icon"><i data-lucide="user" style="width:17px;height:17px;stroke-width:2;"></i></span>
       <input type="text" id="v-nombre" placeholder="Ej: María González" autocomplete="name">
     </div>
   </div>
   <div class="ig">
     <label>Teléfono</label>
     <div class="input-wrap">
-      <span class="input-icon">📞</span>
+      <span class="input-icon"><i data-lucide="phone" style="width:17px;height:17px;stroke-width:2;"></i></span>
       <input type="tel" id="v-tel" placeholder="Ej: 7890-1234" autocomplete="tel">
     </div>
   </div>
@@ -724,18 +736,19 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="tipo-selector">
       <div class="tipo-btn sel" data-tipo="fisica" onclick="selTipo('fisica', 'create')">
         <div class="check-badge">✓</div>
-        <span class="tipo-icon">🖼️</span>Foto física
+        <span class="tipo-icon"><i data-lucide="image" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Foto física
       </div>
       <div class="tipo-btn" data-tipo="digital" onclick="selTipo('digital', 'create')">
         <div class="check-badge">✓</div>
-        <span class="tipo-icon">📱</span>Digital
+        <span class="tipo-icon"><i data-lucide="smartphone" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Digital
       </div>
       <div class="tipo-btn" data-tipo="ambas" onclick="selTipo('ambas', 'create')">
         <div class="check-badge">✓</div>
-        <span class="tipo-icon">✨</span>Fís + Dig.
+        <span class="tipo-icon"><i data-lucide="layers" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Fís + Dig.
       </div>
     </div>
   </div>
+  
   <div class="precio-row">
     <div class="ig">
       <label>Precio ($)</label>
@@ -746,9 +759,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     </div>
     <button class="btn-precio-rapido" onclick="sumar4()" type="button">
       $4
-      <span class="bpr-sub">+FOTO</span>
+      <span class="bpr-sub">+1 FOTO</span>
     </button>
   </div>
+
+  <div class="ig" style="background:rgba(11,16,32,0.9); border:1px solid rgba(123,44,255,0.3); border-radius:18px; padding:16px; margin-bottom:24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+       <div style="display:flex; flex-direction:column; gap:4px;">
+         <label style="margin:0; color:var(--primary-bright); font-size:11px;"><i data-lucide="pin" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> PRODUCTO A DESCONTAR</label>
+         <span id="lbl-producto-fijo" style="font-size:14px; font-weight:700; color:var(--text-main);">Cargando...</span>
+       </div>
+       <div class="qty-ctrl" style="margin-top:0;">
+          <button class="q-btn" style="width:32px;height:32px;font-size:16px;" onclick="adjVentaQty(-1)" type="button">−</button>
+          <span class="q-num" id="v-qty-lbl" style="font-size:16px;">0</span>
+          <button class="q-btn" style="width:32px;height:32px;font-size:16px;" onclick="adjVentaQty(1)" type="button">+</button>
+       </div>
+    </div>
+  </div>
+
   <div class="ig">
     <label>Fotos del cliente <span style="font-size:11px;font-weight:400;opacity:0.6;text-transform:none">(opcional · varias)</span></label>
     <div class="fotos-grid" id="fotos-grid"></div>
@@ -758,13 +786,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <label>Nota <span style="font-size:11px;font-weight:400;opacity:0.6;text-transform:none">(opcional)</span></label>
     <input type="text" id="v-nota" placeholder="Ej: Concierto, Boda, Graduación…">
   </div>
-  <button class="btn btn-primary" onclick="registrarVenta()">📸 Registrar Venta</button>
+  <button class="btn btn-primary" onclick="registrarVenta()"><i data-lucide="camera" style="width:16px;height:16px;stroke-width:2;"></i> Registrar Venta</button>
   
   <div class="section-divider" style="margin-top:28px;"></div>
   
-  <div class="sec-title">🕒 <span>Historial de ventas</span></div>
+  <div class="sec-title"><i data-lucide="clock" style="width:16px;height:16px;stroke-width:2;"></i> <span>Historial de ventas</span></div>
   <div class="search-box">
-    <span>🔍</span>
+    <i data-lucide="search" style="width:15px;height:15px;stroke-width:2;"></i>
     <input type="text" id="search-input" placeholder="Buscar por nombre o teléfono..." oninput="renderVentas()">
   </div>
   
@@ -772,7 +800,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 </div>
 
 <div class="page" id="page-stock">
-  <div class="sec-title">📦 <span>Agregar producto</span></div>
+  <div class="sec-title"><i data-lucide="package-plus" style="width:16px;height:16px;stroke-width:2;"></i> <span>Agregar producto</span></div>
   <div class="ig no-icon"><label>Nombre del producto</label><input type="text" id="p-nombre" placeholder="Ej: Papel Fuji 4x6"></div>
   <div class="row2">
     <div class="ig no-icon"><label>Cantidad inicial</label><input type="number" id="p-cant" placeholder="0" min="0"></div>
@@ -782,14 +810,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="ig no-icon"><label>Costo unitario ($)</label><input type="number" id="p-costo" placeholder="0.00"></div>
     <div class="ig no-icon"><label>Alerta mínimo</label><input type="number" id="p-min" placeholder="5" min="0"></div>
   </div>
-  <button class="btn btn-primary" onclick="addProducto()">📦 Agregar a inventario</button>
+  <button class="btn btn-primary" onclick="addProducto()"><i data-lucide="plus" style="width:16px;height:16px;stroke-width:2;"></i> Agregar a inventario</button>
   <div class="section-divider" style="margin-top:28px;"></div>
-  <div class="list-header"><span class="list-header-icon">📋</span><input type="text" placeholder="Inventario actual" readonly></div>
+  <div class="list-header"><span class="list-header-icon"><i data-lucide="list" style="width:14px;height:14px;stroke-width:2;"></i></span><input type="text" placeholder="Inventario actual" readonly></div>
   <div id="lista-stock"></div>
 </div>
 
 <div class="page" id="page-gastos">
-  <div class="sec-title">💸 <span>Registrar Gasto</span></div>
+  <div class="sec-title"><i data-lucide="minus-circle" style="width:16px;height:16px;stroke-width:2;"></i> <span>Registrar Gasto</span></div>
   <div class="ig no-icon"><label>Descripción</label><input type="text" id="g-desc" placeholder="Ej: Compra de cartuchos"></div>
   <div class="row2">
     <div class="ig no-icon"><label>Monto ($)</label><input type="number" id="g-monto" placeholder="0.00" inputmode="decimal"></div>
@@ -799,14 +827,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       </select>
     </div>
   </div>
-  <button class="btn btn-danger" onclick="addGasto()">💸 Registrar Gasto</button>
+  <button class="btn btn-danger" onclick="addGasto()"><i data-lucide="minus" style="width:16px;height:16px;stroke-width:2;"></i> Registrar Gasto</button>
   <div class="section-divider" style="margin-top:28px;"></div>
-  <div class="list-header"><span class="list-header-icon">📉</span><input type="text" placeholder="Gastos de hoy" readonly></div>
+  <div class="list-header"><span class="list-header-icon"><i data-lucide="trending-down" style="width:14px;height:14px;stroke-width:2;"></i></span><input type="text" placeholder="Gastos de hoy" readonly></div>
   <div id="lista-gastos"></div>
 </div>
 
 <div class="page" id="page-resumen">
-  <div class="sec-title">📊 <span>Balance del día</span></div>
+  <div class="sec-title"><i data-lucide="pie-chart" style="width:16px;height:16px;stroke-width:2;"></i> <span>Balance del día</span></div>
   <div class="stat-card glass s-yellow" style="margin-bottom:18px;padding:22px;">
     <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Ganancia neta hoy</div>
     <div style="font-size:34px;font-weight:800;letter-spacing:-1px;" id="r-ganancia">$0.00</div>
@@ -817,28 +845,54 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="stat-card glass"><div class="stat-sub">Servicios</div><div class="stat-val" id="r-count">0</div></div>
     <div class="stat-card glass"><div class="stat-sub">Prod. Stock</div><div class="stat-val" id="r-stock">0</div></div>
   </div>
-  <div class="sec-title" style="font-size:15px;">⚠️ <span>Alertas de stock</span></div>
+  <div class="sec-title" style="font-size:15px;"><i data-lucide="alert-triangle" style="width:14px;height:14px;stroke-width:2;"></i> <span>Alertas de stock</span></div>
   <div id="r-alertas" style="margin-bottom:22px;"></div>
-  <div class="sec-title" style="font-size:15px;">🕒 <span>Últimos movimientos</span></div>
+  <div class="sec-title" style="font-size:15px;"><i data-lucide="activity" style="width:14px;height:14px;stroke-width:2;"></i> <span>Últimos movimientos</span></div>
   <div id="r-historial" style="margin-bottom:22px;"></div>
-  <button class="btn btn-outline" onclick="exportar()">📤 Exportar reporte .txt</button>
+  <button class="btn btn-outline" onclick="exportar()"><i data-lucide="file-text" style="width:16px;height:16px;stroke-width:2;"></i> Exportar reporte .txt</button>
 </div>
 
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="goTab('ventas')" id="nav-ventas">
-    <div class="nav-icon">📸</div><span>Ventas</span>
+    <div class="nav-icon"><i data-lucide="camera" style="width:20px;height:20px;stroke-width:2;"></i></div><span>Ventas</span>
   </button>
   <button class="nav-btn" onclick="goTab('stock')" id="nav-stock" style="position:relative;">
-    <div class="nav-icon">📦</div><span>Stock</span>
+    <div class="nav-icon"><i data-lucide="package" style="width:20px;height:20px;stroke-width:2;"></i></div><span>Stock</span>
     <div class="nav-dot" id="dot-stock"></div>
   </button>
+
+  <button class="nav-btn" onclick="openQR()">
+    <div class="nav-icon qr-special-icon"><i data-lucide="qr-code" style="width:24px;height:24px;stroke-width:2.5;"></i></div>
+    <span style="color:var(--text-main); font-weight:700;">Insta QR</span>
+  </button>
+
   <button class="nav-btn" onclick="goTab('gastos')" id="nav-gastos">
-    <div class="nav-icon">💸</div><span>Gastos</span>
+    <div class="nav-icon"><i data-lucide="trending-down" style="width:20px;height:20px;stroke-width:2;"></i></div><span>Gastos</span>
   </button>
   <button class="nav-btn" onclick="goTab('resumen')" id="nav-resumen">
-    <div class="nav-icon">📊</div><span>Resumen</span>
+    <div class="nav-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px;stroke-width:2;"></i></div><span>Resumen</span>
   </button>
 </nav>
+
+<div class="ios-modal" id="modal-qr">
+  <div class="modal-top">
+    <h2>Instagram Blink&Print</h2>
+    <button class="btn-close" onclick="closeQR()">✕</button>
+  </div>
+  <div class="modal-content" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top: 20px;">
+    <p style="text-align:center; color:var(--text-muted); font-size:15px; margin-bottom:40px; font-weight:500;">
+      Pide a tu cliente que escanee este código para seguir la página de Instagram.
+    </p>
+    
+    <div style="background: white; padding: 20px; border-radius: 28px; box-shadow: 0 15px 45px rgba(123,44,255,0.3); border: 8px solid rgba(255,255,255,0.1);">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.instagram.com/blink_priint/" alt="QR Instagram" style="display:block; width:220px; height:220px; border-radius: 12px;">
+    </div>
+    
+    <div style="margin-top:40px; font-weight:800; font-size:26px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;">
+      @blink_priint
+    </div>
+  </div>
+</div>
 
 <div class="ios-modal" id="modal-detalle">
   <div class="modal-top">
@@ -849,28 +903,28 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div id="d-fotos-gallery" class="detail-fotos-gallery"></div>
     
     <div class="d-info-block">
-      <div class="d-row"><span class="d-lbl">👤 Cliente</span><span class="d-val" id="d-nombre"></span></div>
-      <div class="d-row"><span class="d-lbl">📞 Teléfono</span><span class="d-val" id="d-tel"></span></div>
-      <div class="d-row"><span class="d-lbl">📅 Fecha</span><span class="d-val" id="d-fecha" style="font-weight:500; font-size:13px; color:var(--text-sec)"></span></div>
-      <div class="d-row"><span class="d-lbl">📍 Nota</span><span class="d-val" id="d-nota" style="font-weight:500; color:var(--text-sec)"></span></div>
-      <div class="d-row"><span class="d-lbl">✨ Tipo</span><span class="d-val" id="d-tipo"></span></div>
-      <div class="d-row"><span class="d-lbl">💵 Total</span><span class="d-val price" id="d-total"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="user" style="width:13px;height:13px;stroke-width:2;"></i> Cliente</span><span class="d-val" id="d-nombre"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="phone" style="width:13px;height:13px;stroke-width:2;"></i> Teléfono</span><span class="d-val" id="d-tel"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="calendar" style="width:13px;height:13px;stroke-width:2;"></i> Fecha</span><span class="d-val" id="d-fecha" style="font-weight:500; font-size:13px; color:var(--text-sec)"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="file-text" style="width:13px;height:13px;stroke-width:2;"></i> Nota</span><span class="d-val" id="d-nota" style="font-weight:500; color:var(--text-sec)"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="tag" style="width:13px;height:13px;stroke-width:2;"></i> Tipo</span><span class="d-val" id="d-tipo"></span></div>
+      <div class="d-row"><span class="d-lbl"><i data-lucide="dollar-sign" style="width:13px;height:13px;stroke-width:2;"></i> Total</span><span class="d-val price" id="d-total"></span></div>
     </div>
 
     <div class="d-actions">
       <button class="btn btn-outline" id="btn-dl-foto" onclick="downloadTodasFotos()">
-        <span style="font-size:18px">💾</span> Descargar Fotos
+        <i data-lucide="download" style="width:18px;height:18px;stroke-width:2;"></i> Descargar Fotos
       </button>
       <button class="btn btn-wa" onclick="sendWhatsApp()">
-        <span style="font-size:18px">💬</span> WhatsApp
+        <i data-lucide="message-circle" style="width:18px;height:18px;stroke-width:2;"></i> WhatsApp
       </button>
     </div>
     
     <button class="btn btn-outline" style="margin-bottom:12px; background:rgba(255,255,255,0.05)" onclick="openEdit()">
-      ✏️ Editar venta
+      <i data-lucide="edit-2" style="width:16px;height:16px;stroke-width:2;"></i> Editar venta
     </button>
     <button class="btn btn-outline-danger" onclick="confirmDeleteCurrent()">
-      🗑 Eliminar venta
+      <i data-lucide="trash-2" style="width:16px;height:16px;stroke-width:2;"></i> Eliminar venta
     </button>
     
     <div class="confirm-bar" id="d-confirm-delete" style="margin-top:15px;">
@@ -895,21 +949,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="ig">
       <label>Tipo de servicio</label>
       <div class="tipo-selector">
-        <div class="tipo-btn sel" data-tipo="fisica" id="et-fisica" onclick="selTipo('fisica', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon">🖼️</span>Física</div>
-        <div class="tipo-btn" data-tipo="digital" id="et-digital" onclick="selTipo('digital', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon">📱</span>Digital</div>
-        <div class="tipo-btn" data-tipo="ambas" id="et-ambas" onclick="selTipo('ambas', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon">✨</span>Ambas</div>
+        <div class="tipo-btn sel" data-tipo="fisica" id="et-fisica" onclick="selTipo('fisica', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon"><i data-lucide="image" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Física</div>
+        <div class="tipo-btn" data-tipo="digital" id="et-digital" onclick="selTipo('digital', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon"><i data-lucide="smartphone" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Digital</div>
+        <div class="tipo-btn" data-tipo="ambas" id="et-ambas" onclick="selTipo('ambas', 'edit')"><div class="check-badge">✓</div><span class="tipo-icon"><i data-lucide="layers" style="width:26px;height:26px;stroke-width:1.5;"></i></span>Ambas</div>
       </div>
     </div>
     <div class="ig"><label>Nota</label><input type="text" id="e-nota"></div>
     <div class="ig">
       <label>Actualizar Foto</label>
       <div class="foto-area" id="e-foto-area" onclick="triggerCamera('e-foto-input')">
-        <div class="foto-placeholder" id="e-foto-ph"><div class="foto-icon-lg">📷</div><p>Tocar para cambiar</p></div>
+        <div class="foto-placeholder" id="e-foto-ph"><div class="foto-icon-lg"><i data-lucide="camera" style="width:26px;height:26px;stroke-width:1.5;"></i></div><p>Tocar para cambiar</p></div>
         <img class="foto-preview" id="e-foto-preview" src="" alt="preview" style="display:none;">
       </div>
       <input type="file" id="e-foto-input" accept="image/*" capture="environment">
     </div>
-    <button class="btn btn-primary" onclick="saveEdit()">💾 Guardar Cambios</button>
+    <button class="btn btn-primary" onclick="saveEdit()"><i data-lucide="save" style="width:16px;height:16px;stroke-width:2;"></i> Guardar Cambios</button>
   </div>
 </div>
 
@@ -920,7 +974,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   </div>
   <div class="modal-content">
 
-    <div class="sec-title">🔡 <span>Tamaño de pantalla</span></div>
+    <div class="sec-title"><i data-lucide="sliders" style="width:16px;height:16px;stroke-width:2;"></i> <span>Tamaño de pantalla</span></div>
     <div class="ui-size-row">
       <input type="range" class="ui-size-slider" id="ui-size-slider" min="1" max="3" step="1" value="2" oninput="previewSize(this.value)">
       <div class="ui-size-labels">
@@ -929,9 +983,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
         <span>Grande</span>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="saveUiSize()" style="margin-bottom:28px;">✓ Aplicar tamaño</button>
+    <button class="btn btn-primary" onclick="saveUiSize()" style="margin-bottom:28px;"><i data-lucide="check" style="width:16px;height:16px;stroke-width:2;"></i> Aplicar tamaño</button>
 
-    <div class="sec-title">💬 <span>Plantilla WhatsApp</span></div>
+    <div class="sec-title"><i data-lucide="message-circle" style="width:16px;height:16px;stroke-width:2;"></i> <span>Plantilla WhatsApp</span></div>
     <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.4;">
       El mensaje se enviará automáticamente al cliente. Usa las variables: <br>
       <b style="color:var(--primary-bright)">{nombre}</b> , <b style="color:var(--primary-bright)">{telefono}</b> , <b style="color:var(--primary-bright)">{fecha}</b>
@@ -939,14 +993,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="ig no-icon">
       <textarea id="config-wa-template"></textarea>
     </div>
-    <button class="btn btn-primary" onclick="saveConfig()">💾 Guardar Plantilla</button>
+    <button class="btn btn-primary" onclick="saveConfig()"><i data-lucide="save" style="width:16px;height:16px;stroke-width:2;"></i> Guardar Plantilla</button>
 
-    <div class="sec-title" style="margin-top:28px;">📦 <span>Exportar ventas del día</span></div>
+    <div class="sec-title" style="margin-top:28px;"><i data-lucide="archive" style="width:16px;height:16px;stroke-width:2;"></i> <span>Exportar ventas del día</span></div>
     <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.4;">
       Genera un archivo .zip con el resumen de ventas y todas las fotos de los clientes del día.
     </p>
     <button class="btn-export-zip" onclick="exportarZip()">
-      <span style="font-size:20px">📦</span> Guardar resumen de ventas
+      <i data-lucide="download" style="width:20px;height:20px;stroke-width:2;"></i> Guardar resumen de ventas
     </button>
 
   </div>
@@ -970,6 +1024,7 @@ let tipoSel='fisica',pendingDel=null;
 let currentDetailIdx = -1;
 let editFotoData = null;
 let editTipoSel = 'fisica';
+let ventaQty = 0; // Cantidad a descontar en venta actual
 
 /* ── IndexedDB (fotos sin límite en iPhone/Safari) ── */
 const DB_NAME='blinkprint-db', DB_VER=1, STORE='fotos';
@@ -1016,6 +1071,12 @@ async function load(){
     if(r){ST=JSON.parse(r);if(!ST.config)ST.config={};}
   }catch(e){}
   let changed=false;
+  
+  // Agregar IDs a productos antiguos si no tienen
+  ST.productos.forEach((p, i) => {
+    if(!p._id){ p._id = 'p-'+Date.now()+'-'+Math.random().toString(36).substr(2,9); changed=true; }
+  });
+
   ST.movimientos.forEach((m,i)=>{
     if(!m._id){m._id=Date.now()+'-'+i;changed=true;}
     // migrate old single foto to fotos array
@@ -1038,8 +1099,11 @@ async function load(){
   }
   if(!ST.config.waTemplate) ST.config.waTemplate = defaultWaTemplate;
   if(changed) await save();
+  
   render();
   renderFotosGrid();
+  renderProductoFijo();
+  
   // apply saved ui size
   applyUiSize(ST.config.uiSize || 2);
   const slEl=$('ui-size-slider'); if(slEl) slEl.value=ST.config.uiSize||2;
@@ -1055,10 +1119,20 @@ function goTab(tab){
   cancelDel();if(tab==='resumen')renderResumen();
 }
 
+/* ── QR INSTAGRAM LOGIC ── */
+function openQR() {
+  $('modal-qr').classList.add('show');
+  if(window.lucide) lucide.createIcons();
+}
+function closeQR() {
+  $('modal-qr').classList.remove('show');
+}
+
 function render(){
   $('lbl-date').textContent=new Date().toLocaleDateString('es',{weekday:'short',day:'numeric',month:'short'});
   renderStrip();renderVentas();renderStock();renderGastos();checkDots();
 }
+if(window.lucide) lucide.createIcons();
 
 function renderStrip(){
   const hoy=today();const movs=ST.movimientos.filter(m=>m.fecha===hoy);
@@ -1121,11 +1195,38 @@ function renderVentas(){
   });
 }
 
-/* ── Sumar $4 ── */
+/* ── UI PRODUCTO FIJADO Y CANTIDAD ── */
+function renderProductoFijo() {
+  const el = $('lbl-producto-fijo');
+  if(!el) return;
+  if(!ST.config.productoFijo) {
+     el.innerHTML = '<span style="color:var(--warning);">⚠️ Ningún producto fijado en Stock</span>';
+     return;
+  }
+  const p = ST.productos.find(x => x._id === ST.config.productoFijo);
+  if(p) {
+     const stColor = p.stock > 0 ? 'var(--success)' : 'var(--danger)';
+     el.innerHTML = `${p.nombre} (<span style="color:${stColor}">${p.stock} disp.</span>)`;
+  } else {
+     el.innerHTML = '<span style="color:var(--danger);">⚠️ Producto eliminado</span>';
+  }
+}
+
+function adjVentaQty(d) {
+   ventaQty += d;
+   if(ventaQty < 0) ventaQty = 0;
+   $('v-qty-lbl').textContent = ventaQty;
+}
+
+/* ── Sumar $4 y 1 foto ── */
 function sumar4(){
   const el=$('v-precio');
   const actual=parseFloat(el.value)||0;
   el.value=(actual+4).toFixed(2);
+  
+  // Aumentar la cantidad a descontar
+  adjVentaQty(1);
+
   // feedback visual
   el.style.transition='box-shadow 0.15s';
   el.style.boxShadow='0 0 0 3px rgba(0,255,136,0.35)';
@@ -1160,13 +1261,48 @@ async function registrarVenta(){
   const precio=parseFloat($('v-precio').value)||0;const nota=$('v-nota').value.trim();
   if(!nombre){showToast('Ingresa el nombre del cliente',true);return;}
   if(!precio){showToast('Ingresa el precio',true);return;}
-  const mov={tipo:'venta',_id:Date.now()+'-'+Math.random().toString(36).slice(2),nombre,telefono:tel,tipoServicio:tipoSel,total:precio.toFixed(2),nota,fotos:[],fecha:today(),hora:hora()};
+  
+  // Logica de descuento de stock
+  if (ventaQty > 0) {
+      if (!ST.config.productoFijo) {
+          showToast('⚠️ Fija un producto en Stock para descontar', true);
+          return;
+      }
+      const pIdx = ST.productos.findIndex(x => x._id === ST.config.productoFijo);
+      if (pIdx > -1) {
+          if (ST.productos[pIdx].stock < ventaQty) {
+              showToast('⚠️ No hay suficiente stock del producto fijado', true);
+              return;
+          }
+          ST.productos[pIdx].stock -= ventaQty;
+      } else {
+          showToast('⚠️ El producto fijado ya no existe', true);
+          return;
+      }
+  }
+
+  const mov={
+    tipo:'venta', 
+    _id:Date.now()+'-'+Math.random().toString(36).slice(2),
+    nombre, telefono:tel, tipoServicio:tipoSel, total:precio.toFixed(2), nota, fotos:[], fecha:today(), hora:hora(),
+    qtyDescontada: ventaQty,
+    productoDescontado: ST.config.productoFijo
+  };
+  
   if(fotosData.length) await setFotos(mov, fotosData);
   ST.movimientos.push(mov);
+  
+  // Resets
   $('v-nombre').value='';$('v-tel').value='';$('v-precio').value='';$('v-nota').value='';
   fotosData=[];renderFotosGrid();
   $('foto-input').value='';
-  selTipo('fisica','create');await save();render();showToast('\u2713 Venta registrada +'+fmt(precio));
+  ventaQty = 0; $('v-qty-lbl').textContent = ventaQty;
+  
+  selTipo('fisica','create');
+  await save();
+  renderProductoFijo(); // Actualiza disponibilidad en interfaz
+  render(); // Llama renderStock para actualizar tab de stock
+  showToast('\u2713 Venta registrada +'+fmt(precio));
 }
 
 function selTipo(t, mode){
@@ -1192,7 +1328,7 @@ function compressImage(file, cb){
       if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
       const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg',9.9));
+      cb(canvas.toDataURL('image/jpeg',1.0));
     };img.src=e.target.result;
   };reader.readAsDataURL(file);
 }
@@ -1253,16 +1389,30 @@ async function openDetail(idx) {
 
   $('d-confirm-delete').classList.remove('show');
   $('modal-detalle').classList.add('show');
+  if(window.lucide) lucide.createIcons();
 }
 function closeDetail() { $('modal-detalle').classList.remove('show'); currentDetailIdx = -1; }
 
 function confirmDeleteCurrent() { $('d-confirm-delete').classList.add('show'); }
 async function deleteCurrentVenta() {
   if(currentDetailIdx > -1) {
-    const v=ST.movimientos[currentDetailIdx];
+    const v = ST.movimientos[currentDetailIdx];
+    
+    // Reembolsar stock si hubo descuento
+    if (v.qtyDescontada && v.productoDescontado) {
+       const pIdx = ST.productos.findIndex(x => x._id === v.productoDescontado);
+       if (pIdx > -1) {
+          ST.productos[pIdx].stock += v.qtyDescontada;
+       }
+    }
+
     if(v&&v.fotos) for(let i=0;i<v.fotos.length;i++) await dbDel(fotoKey(v,i));
     ST.movimientos.splice(currentDetailIdx, 1);
-    await save(); render(); closeDetail(); showToast('Venta eliminada', true);
+    await save(); 
+    render(); 
+    renderProductoFijo(); // Actualiza display en pestaña de ventas
+    closeDetail(); 
+    showToast('Venta eliminada', true);
   }
 }
 
@@ -1341,6 +1491,7 @@ async function openEdit() {
     $('e-foto-ph').style.display = 'flex';
   }
   $('modal-editar').classList.add('show');
+  if(window.lucide) lucide.createIcons();
 }
 
 function closeEdit() { $('modal-editar').classList.remove('show'); }
@@ -1404,6 +1555,7 @@ function openConfig(){
   const sz = ST.config.uiSize || 2;
   $('ui-size-slider').value = sz;
   $('modal-config').classList.add('show');
+  if(window.lucide) lucide.createIcons();
 }
 
 function saveConfig() {
@@ -1471,8 +1623,21 @@ async function exportarZip(){
 }
 
 /* =========================================================
-   STOCK Y GASTOS (Mantenido igual)
+   STOCK Y GASTOS
 ========================================================= */
+
+function fijarProducto(id) {
+   if(ST.config.productoFijo === id) {
+       ST.config.productoFijo = null; // Unpin
+   } else {
+       ST.config.productoFijo = id;
+   }
+   save();
+   renderStock();
+   renderProductoFijo();
+   showToast(ST.config.productoFijo ? 'Producto fijado para ventas' : 'Producto desfijado');
+}
+
 function renderStock(){
   const el=$('lista-stock');
   if(!ST.productos.length){el.innerHTML='<div class="empty"><div class="empty-i">📦</div><p>Sin productos aún</p></div>';return;}
@@ -1482,19 +1647,25 @@ function renderStock(){
     const lbl=p.stock===0?'Agotado':p.stock<=(p.minimo||5)?'Bajo':'Óptimo';
     const cid=`cp-${i}`;
     const wrap=document.createElement('div');
-    wrap.innerHTML=`<div class="stock-card"><div class="sc-header"><div class="sc-name">${p.nombre}</div><span class="sc-badge ${cls}">${lbl}</span></div><div class="sc-stats"><div class="sc-stat-item"><span class="sc-stat-lbl">Precio</span><span class="sc-stat-val" style="color:var(--success)">${fmt(p.precio)}</span></div><div class="sc-stat-item"><span class="sc-stat-lbl">Costo</span><span class="sc-stat-val" style="color:var(--danger)">${fmt(p.costo)}</span></div><div class="sc-stat-item"><span class="sc-stat-lbl">Mínimo</span><span class="sc-stat-val">${p.minimo||5}</span></div></div><div style="display:flex;justify-content:space-between;align-items:center;"><div class="qty-ctrl"><button class="q-btn" data-i="${i}" data-d="-1">−</button><span class="q-num">${p.stock}</span><button class="q-btn" data-i="${i}" data-d="1">+</button></div><button class="action-btn btn-del" style="margin-top:12px" data-cid="${cid}">🗑</button></div></div><div class="confirm-bar" id="${cid}"><span class="confirm-msg">¿Eliminar producto?</span><div class="c-actions"><button class="c-btn c-no">Cancelar</button><button class="c-btn c-yes" data-pi="${i}">Borrar</button></div></div>`;
+    
+    const isFijo = p._id === ST.config.productoFijo;
+    const btnFijoStyle = isFijo ? 'background:rgba(123,44,255,0.2);color:var(--primary-bright);border:1px solid var(--primary-bright);' : 'background:rgba(255,255,255,0.05);color:var(--text-sec);border:1px solid var(--border-glass);';
+    
+    wrap.innerHTML=`<div class="stock-card"><div class="sc-header"><div class="sc-name">${p.nombre}</div><span class="sc-badge ${cls}">${lbl}</span></div><div class="sc-stats"><div class="sc-stat-item"><span class="sc-stat-lbl">Precio</span><span class="sc-stat-val" style="color:var(--success)">${fmt(p.precio)}</span></div><div class="sc-stat-item"><span class="sc-stat-lbl">Costo</span><span class="sc-stat-val" style="color:var(--danger)">${fmt(p.costo)}</span></div><div class="sc-stat-item"><span class="sc-stat-lbl">Mínimo</span><span class="sc-stat-val">${p.minimo||5}</span></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;"><div class="qty-ctrl" style="margin-top:0;"><button class="q-btn" data-i="${i}" data-d="-1">−</button><span class="q-num">${p.stock}</span><button class="q-btn" data-i="${i}" data-d="1">+</button></div><div style="display:flex; gap:8px;"><button class="action-btn" style="${btnFijoStyle}" onclick="fijarProducto('${p._id}')" title="Fijar para ventas"><i data-lucide="pin" style="width:14px;height:14px;stroke-width:2;"></i></button><button class="action-btn btn-del" data-cid="${cid}"><i data-lucide="trash-2" style="width:14px;height:14px;stroke-width:2;"></i></button></div></div></div><div class="confirm-bar" id="${cid}"><span class="confirm-msg">¿Eliminar producto?</span><div class="c-actions"><button class="c-btn c-no">Cancelar</button><button class="c-btn c-yes" data-pi="${i}">Borrar</button></div></div>`;
     el.appendChild(wrap);
   });
-  el.querySelectorAll('.q-btn').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i,d=+b.dataset.d;const n=(ST.productos[i].stock||0)+d;if(n<0)return;ST.productos[i].stock=n;save();render();}));
+  el.querySelectorAll('.q-btn').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i,d=+b.dataset.d;const n=(ST.productos[i].stock||0)+d;if(n<0)return;ST.productos[i].stock=n;save();render(); renderProductoFijo();}));
   el.querySelectorAll('[data-cid]').forEach(b=>b.addEventListener('click',()=>{cancelDel();const bar=$(b.dataset.cid);if(bar){bar.classList.add('show');pendingDel=b.dataset.cid;}}));
   el.querySelectorAll('.c-no').forEach(b=>b.addEventListener('click',cancelDel));
   el.querySelectorAll('.c-yes[data-pi]').forEach(b=>b.addEventListener('click',()=>{ST.productos.splice(+b.dataset.pi,1);pendingDel=null;save();render();showToast('Producto eliminado');}));
+  
+  if(window.lucide) lucide.createIcons();
 }
 
 function addProducto(){
   const nombre=$('p-nombre').value.trim();
   if(!nombre){showToast('Ingresa el nombre',true);return;}
-  ST.productos.push({nombre,stock:parseInt($('p-cant').value)||0,precio:parseFloat($('p-precio').value)||0,costo:parseFloat($('p-costo').value)||0,minimo:parseInt($('p-min').value)||5});
+  ST.productos.push({_id: 'p-'+Date.now()+'-'+Math.random().toString(36).substr(2,9), nombre,stock:parseInt($('p-cant').value)||0,precio:parseFloat($('p-precio').value)||0,costo:parseFloat($('p-costo').value)||0,minimo:parseInt($('p-min').value)||5});
   $('p-nombre').value='';$('p-cant').value='';$('p-precio').value='';$('p-costo').value='';$('p-min').value='';
   save();render();showToast('Producto guardado');
 }
@@ -1557,6 +1728,7 @@ function exportar(){
 }
 
 load();
+if(window.lucide) lucide.createIcons();
 </script>
 </body>
 </html>
