@@ -909,17 +909,11 @@ const fmt=n=>'$'+(parseFloat(n)||0).toFixed(2);
 const today=()=>new Date().toISOString().split('T')[0];
 const hora=()=>new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
 
-const defaultWaTemplate = `Hola {nombre} 💗🫶🏼
-Te desea Blink&Print 📸
-Donde compartimos nuestros momentos inolvidables donde quiera que estén.
-Les agradecemos mucho por vivir este momento lleno de sonrisas.
-Esperamos que les encanten las fotos y que las disfruten muchísimo.
-Aquí les compartimos su fotografía digital.
-Si te encantó nuestra experiencia, no olvides etiquetarnos en Instagram:
-https://www.instagram.com/blink_priint/
-📸🥰
-Nos puedes seguir y volver a ser protagonista en nuestros próximos eventos.
-📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸`;
+const defaultWaTemplate = `Hola {nombre} 💗🫶🏼 Blink&Print 📸💗
+te agradecemos mucho por congelar su momento magico con nosotros
+Aquí les compartimos su fotografía digital. 📸
+etiquetanos Instagram!  https://www.instagram.com/blink_priint/
+📸`;
 
 let ST={productos:[],movimientos:[],config:{}};
 let fotosData=[]; // array de base64 para la venta actual
@@ -1146,7 +1140,7 @@ function compressImage(file, cb){
       if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
       const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg',1.0));
+      cb(canvas.toDataURL('image/jpeg',9.5));
     };img.src=e.target.result;
   };reader.readAsDataURL(file);
 }
