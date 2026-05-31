@@ -1217,7 +1217,6 @@ async function deleteCurrentVenta() {
 /* =========================================================
    DESCARGA FOTO y WHATSAPP
 ========================================================= */
-/* --- 1. Lógica para capturar y previsualizar (Sin errores de memoria) --- */
 $('foto-input').addEventListener('change', function() {
   const file = this.files[0];
   if (!file) return;
@@ -1226,59 +1225,42 @@ $('foto-input').addEventListener('change', function() {
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
-      const canvas = document.createElement('canvas');
-      // Mantenemos tamaño real pero aseguramos formato JPEG limpio
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      
-      // Calidad 0.85: Visualmente perfecta pero elimina metadatos corruptos de iPhone
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.70);
-      
-      fotoData = dataUrl;
-      $('foto-preview').src = dataUrl;
-      $('foto-preview').style.display = 'block';
-      
-      const placeholder = $('foto-area').querySelector('.foto-placeholder');
-      if (placeholder) placeholder.style.display = 'none';
-      const btnChange = $('foto-change');
-      if (btnChange) btnChange.style.display = 'block';
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Intentamos generar la imagen
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.70);
+        
+        // VALIDACIÓN: ¿Realmente se creó la imagen?
+        if (!dataUrl || dataUrl.length < 100) {
+          alert("Error: La imagen procesada está vacía.");
+          return;
+        }
+
+        fotoData = dataUrl;
+        $('foto-preview').src = dataUrl;
+        $('foto-preview').style.display = 'block';
+        
+        console.log("Foto procesada con éxito, tamaño:", dataUrl.length);
+        
+        const placeholder = $('foto-area').querySelector('.foto-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+        
+        const btnChange = $('foto-change');
+        if (btnChange) btnChange.style.display = 'block';
+        
+      } catch (err) {
+        alert("Error crítico en el canvas: " + err.message);
+      }
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
-  this.value = '';
 });
-
-/* --- 2. Lógica de Descarga Optimizada --- */
-function dataURLtoBlob(dataURL) {
-  const arr = dataURL.split(',');
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while(n--) u8arr[n] = bstr.charCodeAt(n);
-  return new Blob([u8arr], {type: mime});
-}
-
-async function downloadFoto(src, fileName) {
-  if (!src) return;
-  try {
-    const blob = dataURLtoBlob(src);
-    const file = new File([blob], fileName, { type: 'image/jpeg' });
-    
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file] });
-    } else {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-    }
-  } catch(e) { window.open(src, '_blank'); }
-}
 
 function sendWhatsApp() {
   const v = ST.movimientos[currentDetailIdx];
