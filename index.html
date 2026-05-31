@@ -1222,41 +1222,36 @@ $('foto-input').addEventListener('change', function() {
   if (!file) return;
 
   const reader = new FileReader();
+  
+  // Esto lee el archivo como texto Base64 directamente. 
+  // No hay canvas, no hay error de seguridad, y es 100% permanente.
   reader.onload = function(e) {
-    const img = new Image();
+    const base64Data = e.target.result;
     
-    // --- ESTA ES LA LÍNEA MÁGICA QUE EVITA EL ERROR ---
-    img.crossOrigin = "Anonymous"; 
+    // Guardamos la cadena larga en la variable.
+    // Al ser un String, IndexedDB lo guardará permanentemente en el disco.
+    fotoData = base64Data;
     
-    img.onload = function() {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        
-        // Generamos la imagen con un formato seguro
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.70);
-        
-        fotoData = dataUrl;
-        $('foto-preview').src = dataUrl;
-        $('foto-preview').style.display = 'block';
-        
-        const placeholder = $('foto-area').querySelector('.foto-placeholder');
-        if (placeholder) placeholder.style.display = 'none';
-        
-        const btnChange = $('foto-change');
-        if (btnChange) btnChange.style.display = 'block';
-        
-      } catch (err) {
-        alert("Error al procesar la imagen: " + err.message);
-      }
-    };
-    img.src = e.target.result;
+    // Previsualización directa
+    $('foto-preview').src = base64Data;
+    $('foto-preview').style.display = 'block';
+    
+    const placeholder = $('foto-area').querySelector('.foto-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
+    
+    const btnChange = $('foto-change');
+    if (btnChange) btnChange.style.display = 'block';
+    
+    showToast('Foto guardada permanentemente');
   };
+  
+  // Aquí leemos el archivo original. 
+  // Si la foto es extremadamente pesada, tardará un segundo más, 
+  // pero es la forma más segura y estable.
   reader.readAsDataURL(file);
+  this.value = '';
 });
+  
 function sendWhatsApp() {
   const v = ST.movimientos[currentDetailIdx];
   if(!v || !v.telefono) { showToast('El cliente no tiene teléfono', true); return; }
